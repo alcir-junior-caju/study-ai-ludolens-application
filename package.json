@@ -1,0 +1,24 @@
+{
+  "name": "ludolens-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ludolens - Assistente IA para jogos de mesa (Monorepo)",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "devDependencies": {
+    "turbo": "latest",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "yarn@1.22.19",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,287 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: ludoLens
+meta:
+  id: wrk_af568232bd3945ba8c3cf059f2ef7942
+  created: 1767809356233
+  modified: 1767809356233
+  description: ""
+collection:
+  - name: Manuals
+    meta:
+      id: fld_4f036591870541b79d40e1836845d237
+      created: 1743465063061
+      modified: 1767809608350
+      sortKey: -1743465063061
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/{{ _.resource }}"
+        name: Get All
+        meta:
+          id: req_f48ab9b4ed384d69b41239b780fb215b
+          created: 1767809610653
+          modified: 1767809871306
+          isPrivate: false
+          description: ""
+          sortKey: -1767809610653
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/{{ _.resource }}/:id"
+        name: Get
+        meta:
+          id: req_5b9fba66fca84413bb5ad011843bc70e
+          created: 1767809843601
+          modified: 1767878921327
+          isPrivate: false
+          description: ""
+          sortKey: -1764171984832
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+        pathParameters:
+          - name: id
+            value: ca643ff3-4439-4f9c-82d5-bde11259077c
+      - url: "{{ _.base_url }}/{{ _.resource }}/:id"
+        name: Delete
+        meta:
+          id: req_6432d2a9f2d9455ab32d3be2e74cf08a
+          created: 1767809988653
+          modified: 1767809995780
+          isPrivate: false
+          description: ""
+          sortKey: -1762353171921.5
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.2.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+        pathParameters:
+          - name: id
+            value: "1704567890123"
+      - url: "{{ _.base_url }}/{{ _.resource }}"
+        name: Post
+        meta:
+          id: req_94c63fae355a41e698052cb6ef2230bb
+          created: 1767810044057
+          modified: 1767881791253
+          isPrivate: false
+          description: ""
+          sortKey: -1767809610753
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: /Users/alcirjunior/Downloads/dobro-pixar-os-incriveis.pdf
+              type: file
+            - name: gameName
+              value: Dobro Pixar - Os incriveis
+              description: ""
+              disabled: false
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    environment:
+      resource: manuals
+    environmentPropertyOrder:
+      "&":
+        - resource
+  - name: Query
+    meta:
+      id: fld_274e2a934da64e8a8e8f4481933c4f8e
+      created: 1767812201195
+      modified: 1767812263069
+      sortKey: -1736663382542
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/{{ _.resource }}/text"
+        name: Post
+        meta:
+          id: req_f08733c1f8be4df8a4b44e22763a71f8
+          created: 1767812201197
+          modified: 1767878936449
+          isPrivate: false
+          description: ""
+          sortKey: -1767809610753
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "manualId": "ca643ff3-4439-4f9c-82d5-bde11259077c",
+              "question": "Temos cartas especiais?"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/{{ _.resource }}"
+        name: Post Image
+        meta:
+          id: req_9c133b868d6a4a95ab4b921eb9d32d46
+          created: 1767812350372
+          modified: 1767815254233
+          isPrivate: false
+          description: ""
+          sortKey: -1767809610853
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: image
+              value: ""
+              description: ""
+              disabled: false
+              fileName: /Users/alcirjunior/Downloads/mesa.jpg
+              type: file
+            - name: question
+              value: Dobro Pixar
+              description: ""
+              disabled: true
+            - name: manualId
+              value: 3c07c007-ef6f-4054-ac3e-26ad2e61eedc
+              description: ""
+              disabled: false
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    environment:
+      resource: query
+    environmentPropertyOrder:
+      "&":
+        - resource
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_4c431cf4003840a0be1949b73d27891e
+    created: 1733231648297
+    modified: 1733231648297
+  cookies:
+    - id: 31e469be-9cca-4fed-aa32-481bb387bbdd
+      key: koa.sess
+      value: eyJncmFudCI6eyJwcm92aWRlciI6ImtleWNsb2FrIn0sIl9leHBpcmUiOjE3MjMxNDg5MDc3NjUsIl9tYXhBZ2UiOjg2NDAwMDAwfQ==
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+    - id: 4e86fd9d-30a2-4bd7-af9b-f096b110019d
+      key: koa.sess.sig
+      value: RUVwn4ycecRI1O-ZMAEN3Vf-wS0
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+    - id: c564451c-a65e-46f6-8fb3-362d1f1faab1
+      key: AUTH_SESSION_ID
+      value: 5b064c74-24e1-497b-b910-9db62ed65c2a
+      domain: localhost
+      path: /realms/perifaplus/
+      secure: true
+      httpOnly: true
+      extensions:
+        - Version=1
+      hostOnly: true
+    - id: b047420b-c09e-4ef3-81de-41397c660657
+      key: AUTH_SESSION_ID_LEGACY
+      value: 5b064c74-24e1-497b-b910-9db62ed65c2a
+      domain: localhost
+      path: /realms/perifaplus/
+      secure: false
+      httpOnly: true
+      extensions:
+        - Version=1
+      hostOnly: true
+    - id: c2b7c146-8a4e-4f8f-a36f-d42d768ae01a
+      key: KC_RESTART
+      value: eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkZmU1YjgyMy05ZDg0LTRkZGQtODM1OS1kMzlmZjlkMmU3MDkifQ.eyJjaWQiOiJwZXJpZmFsaWIiLCJwdHkiOiJvcGVuaWQtY29ubmVjdCIsInJ1cmkiOiJodHRwOi8vbG9jYWxob3N0OjEzMzcvYXBpL2Nvbm5lY3Qva2V5Y2xvYWsvY2FsbGJhY2siLCJhY3QiOiJBVVRIRU5USUNBVEUiLCJub3RlcyI6eyJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Qua2V5Y2xvYWsvcmVhbG1zL3BlcmlmYXBsdXMiLCJyZXNwb25zZV90eXBlIjoiY29kZSIsInJlZGlyZWN0X3VyaSI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNy9hcGkvY29ubmVjdC9rZXljbG9hay9jYWxsYmFjayJ9fQ.i9KdQB3r46mTVXBXG-UnzviRocJldspHUtHutXr6v35DGvdvxkv7MDlRabhBug4trGSP7ZKZCPbt1lg-y4LYtg
+      domain: localhost
+      path: /realms/perifaplus/
+      secure: false
+      httpOnly: true
+      extensions:
+        - Version=1
+      hostOnly: true
+environments:
+  name: Base Environment
+  meta:
+    id: env_b3ce052eaba4466b8aad2c49352555b6
+    created: 1733231648293
+    modified: 1733231648293
+    isPrivate: false
+  subEnvironments:
+    - name: local
+      meta:
+        id: env_1a95428bddee4f9a941e66803e82b435
+        created: 1733231648295
+        modified: 1767879533410
+        isPrivate: false
+        sortKey: 1653342120746
+      data:
+        base_url: http://localhost:3000/api
+      color: "#0011ff"
