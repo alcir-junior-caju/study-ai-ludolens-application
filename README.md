@@ -24,6 +24,10 @@ Para quem quiser visualizar o projeto na IDE clique no teclado a tecla `ponto`, 
 ## 📋 Prints
 
 <p align="center">
+  <img alt="GIF" src="_images/rodada.gif" width="75%" style="margin: 15px 0" />
+</p>
+
+<p align="center">
   <img alt="Tela 01" src="_images/tela-1.png" width="75%" style="margin: 15px 0" />
 </p>
 
