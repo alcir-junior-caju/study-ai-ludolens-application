@@ -6,6 +6,8 @@ import { appConfig } from '../infra/config.js'
 import { aiLogger } from '../infra/logger.js'
 import type { DocumentChunk } from '../types/game.types.js'
 
+const VECTOR_DIMENSIONS = 768
+
 export class EmbeddingsService {
   private embeddings: GoogleGenerativeAIEmbeddings
   private pool: Pool
@@ -14,7 +16,7 @@ export class EmbeddingsService {
   constructor() {
     this.embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: appConfig.googleApiKey,
-      model: 'text-embedding-004',
+      model: 'gemini-embedding-001',
     })
 
     this.pool = new Pool({
@@ -47,7 +49,7 @@ export class EmbeddingsService {
 
       aiLogger.info('PGVectorStore inicializado com sucesso')
     } catch (error) {
-      aiLogger.error({ error }, 'Erro ao inicializar PGVectorStore')
+      aiLogger.error({ err: error }, 'Erro ao inicializar PGVectorStore')
       throw error
     }
   }
@@ -74,23 +76,62 @@ export class EmbeddingsService {
 
       const vectorStore = await this.ensureVectorStore()
 
-      const documents = chunks.map(
+      const validChunks = chunks.filter((chunk) => chunk.content.trim().length > 0)
+
+      if (validChunks.length === 0) {
+        throw new Error('Nenhum chunk válido encontrado para indexação')
+      }
+
+      aiLogger.info(
+        { manualId, original: chunks.length, valid: validChunks.length },
+        'Chunks filtrados'
+      )
+
+      const documents = validChunks.map(
         (chunk) =>
           new Document({
             pageContent: chunk.content,
             metadata: {
               ...chunk.metadata,
-              manualId, // Adiciona manualId aos metadados para filtrar depois
+              manualId,
             },
           })
       )
 
-      await vectorStore.addDocuments(documents)
+      const texts = documents.map((doc) => doc.pageContent)
+      const vectors = await this.embeddings.embedDocuments(texts)
+
+      aiLogger.info(
+        {
+          manualId,
+          vectorCount: vectors.length,
+          dimensions: vectors[0]?.length ?? 0,
+          emptyVectors: vectors.filter((v) => v.length === 0).length,
+        },
+        'Embeddings gerados'
+      )
+
+      const validPairs = documents.reduce<{ docs: Document[]; vecs: number[][] }>(
+        (acc, doc, i) => {
+          if (vectors[i] && vectors[i].length > 0) {
+            acc.docs.push(doc)
+            acc.vecs.push(vectors[i].slice(0, VECTOR_DIMENSIONS))
+          }
+          return acc
+        },
+        { docs: [], vecs: [] }
+      )
+
+      if (validPairs.docs.length === 0) {
+        throw new Error('Nenhum embedding válido foi gerado pela API')
+      }
+
+      await vectorStore.addVectors(validPairs.vecs, validPairs.docs)
 
       aiLogger.info({ manualId }, 'Documentos indexados com sucesso no PostgreSQL')
     } catch (error) {
-      aiLogger.error({ error, manualId }, 'Erro ao indexar documentos')
-      throw new Error('Falha ao gerar embeddings')
+      aiLogger.error({ err: error, manualId }, 'Erro ao indexar documentos')
+      throw error
     }
   }
 
@@ -107,15 +148,18 @@ export class EmbeddingsService {
 
       const vectorStore = await this.ensureVectorStore()
 
-      // Busca com filtro para retornar apenas documentos do manual específico
-      const results = await vectorStore.similaritySearch(query, topK, {
+      const queryVector = await this.embeddings.embedQuery(query)
+      const truncatedVector = queryVector.slice(0, VECTOR_DIMENSIONS)
+
+      const resultsWithScore = await vectorStore.similaritySearchVectorWithScore(truncatedVector, topK, {
         manualId,
       })
 
+      const results = resultsWithScore.map(([doc]) => doc)
       aiLogger.info({ manualId, resultsCount: results.length }, 'Documentos encontrados')
       return results
     } catch (error) {
-      aiLogger.error({ error, manualId }, 'Erro ao buscar documentos')
+      aiLogger.error({ err: error, manualId }, 'Erro ao buscar documentos')
       throw new Error('Falha na busca de documentos')
     }
   }
@@ -140,7 +184,7 @@ export class EmbeddingsService {
         client.release()
       }
     } catch (error) {
-      aiLogger.error({ error, manualId }, 'Erro ao remover manual')
+      aiLogger.error({ err: error, manualId }, 'Erro ao remover manual')
       return false
     }
   }
@@ -161,7 +205,7 @@ export class EmbeddingsService {
         client.release()
       }
     } catch (error) {
-      aiLogger.error({ error, manualId }, 'Erro ao verificar manual indexado')
+      aiLogger.error({ err: error, manualId }, 'Erro ao verificar manual indexado')
       return false
     }
   }

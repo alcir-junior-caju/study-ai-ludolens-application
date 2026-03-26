@@ -3,6 +3,7 @@ import { HumanMessage, SystemMessage, AIMessage } from '@langchain/core/messages
 import { appConfig } from '../infra/config.js'
 import { aiLogger } from '../infra/logger.js'
 import { embeddingsService } from '../services/embeddings.service.js'
+import { promptEnrichmentService } from '../services/prompt-enrichment.service.js'
 
 export class RuleAgent {
   private model: ChatGoogleGenerativeAI
@@ -10,7 +11,7 @@ export class RuleAgent {
   constructor() {
     this.model = new ChatGoogleGenerativeAI({
       apiKey: appConfig.googleApiKey,
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash-lite',
       temperature: 0.2, // Baixa temperatura para respostas mais precisas
     })
   }
@@ -26,10 +27,15 @@ export class RuleAgent {
     try {
       aiLogger.info({ manualId }, 'Iniciando análise de consulta')
 
-      // 1. Se há pergunta explícita, usar para busca contextual
-      const searchQuery = userQuestion || 'Qual regra se aplica a esta situação de jogo?'
+      // 1. Se há pergunta explícita, enriquecer o prompt para melhorar a busca
+      const originalQuery = userQuestion || 'Qual regra se aplica a esta situação de jogo?'
 
-      // 2. Buscar documentos relevantes do manual
+      const { enrichedQuery, searchTerms } = await promptEnrichmentService.enrichQuery(originalQuery)
+      const searchQuery = promptEnrichmentService.buildSearchQuery(enrichedQuery, searchTerms)
+
+      aiLogger.info({ originalQuery, enrichedQuery, searchTerms }, 'Query enriquecida para busca')
+
+      // 2. Buscar documentos relevantes do manual com a query enriquecida
       const relevantDocs = await embeddingsService.searchSimilarDocuments(manualId, searchQuery, 3)
 
       // 3. Construir contexto do manual
@@ -54,9 +60,9 @@ export class RuleAgent {
         Responda de forma direta e útil para que os jogadores possam continuar a partida rapidamente.
       `
 
-      // 5. Construir mensagem do usuário
+      // 5. Construir mensagem do usuário com a pergunta enriquecida
       const userPrompt = userQuestion
-        ? `${userQuestion}\n\n[Imagem da mesa de jogo anexada]`
+        ? `${enrichedQuery}\n\n[Imagem da mesa de jogo anexada]`
         : 'Qual regra se aplica a esta situação mostrada na imagem?'
 
       // 6. Invocar o modelo com a imagem
@@ -89,7 +95,7 @@ export class RuleAgent {
 
       return answer
     } catch (error) {
-      aiLogger.error({ error, manualId }, 'Erro ao analisar consulta')
+      aiLogger.error({ err: error, manualId }, 'Erro ao analisar consulta')
       throw new Error('Falha ao processar consulta')
     }
   }
@@ -101,8 +107,14 @@ export class RuleAgent {
     try {
       aiLogger.info({ manualId, question }, 'Processando consulta de texto')
 
-      // Buscar contexto relevante
-      const relevantDocs = await embeddingsService.searchSimilarDocuments(manualId, question, 3)
+      // Enriquecer a pergunta para melhorar a busca vetorial
+      const { enrichedQuery, searchTerms } = await promptEnrichmentService.enrichQuery(question)
+      const searchQuery = promptEnrichmentService.buildSearchQuery(enrichedQuery, searchTerms)
+
+      aiLogger.info({ question, enrichedQuery, searchTerms }, 'Query de texto enriquecida')
+
+      // Buscar contexto relevante com a query enriquecida
+      const relevantDocs = await embeddingsService.searchSimilarDocuments(manualId, searchQuery, 3)
 
       const context = relevantDocs.map((doc) => doc.pageContent).join('\n\n')
 
@@ -114,7 +126,7 @@ export class RuleAgent {
         CONTEXTO DO MANUAL: ${context}
       `
 
-      const messages = [new SystemMessage(systemPrompt), new HumanMessage(question)]
+      const messages = [new SystemMessage(systemPrompt), new HumanMessage(enrichedQuery)]
 
       const stream = await this.model.stream(messages)
 
@@ -127,7 +139,7 @@ export class RuleAgent {
 
       return answer
     } catch (error) {
-      aiLogger.error({ error, manualId }, 'Erro ao responder pergunta')
+      aiLogger.error({ err: error, manualId }, 'Erro ao responder pergunta')
       throw new Error('Falha ao processar pergunta')
     }
   }

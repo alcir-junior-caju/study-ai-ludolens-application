@@ -1,7 +1,8 @@
 import { config } from 'dotenv'
+import { resolve } from 'path'
 
-// Carregar variáveis de ambiente
-config()
+// Carregar variáveis de ambiente da raiz do monorepo
+config({ path: resolve(process.cwd(), '../../.env') })
 
 export const appConfig = {
   port: Number(process.env.PORT) || 3000,

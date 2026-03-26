@@ -48,13 +48,13 @@ export class ManualService {
 
       // 3. Processar PDF em background (assíncrono)
       this.processManual(manualId, file).catch((error) => {
-        uploadLogger.error({ error, manualId }, 'Erro no processamento do manual')
+        uploadLogger.error({ err: error, manualId }, 'Erro no processamento do manual')
       })
 
       uploadLogger.info({ manualId }, 'Manual salvo, processamento iniciado')
       return manual
     } catch (error) {
-      uploadLogger.error({ error, manualId }, 'Erro ao fazer upload do manual')
+      uploadLogger.error({ err: error, manualId }, 'Erro ao fazer upload do manual')
       throw new Error('Falha ao fazer upload do manual')
     }
   }
@@ -88,12 +88,12 @@ export class ManualService {
         await fileStorage.deleteFile(`${manualId}.pdf`)
         uploadLogger.info({ manualId }, 'Arquivo PDF removido após processamento')
       } catch (error) {
-        uploadLogger.warn({ error, manualId }, 'Não foi possível remover arquivo PDF')
+        uploadLogger.warn({ err: error, manualId }, 'Não foi possível remover arquivo PDF')
       }
 
       uploadLogger.info({ manualId }, 'Manual processado com sucesso')
     } catch (error) {
-      uploadLogger.error({ error, manualId }, 'Erro ao processar manual')
+      uploadLogger.error({ err: error, manualId }, 'Erro ao processar manual')
       throw error
     }
   }
@@ -123,7 +123,7 @@ export class ManualService {
         processedAt: row.processed_at,
       }
     } catch (error) {
-      uploadLogger.error({ error, manualId }, 'Erro ao buscar manual')
+      uploadLogger.error({ err: error, manualId }, 'Erro ao buscar manual')
       return undefined
     }
   }
@@ -147,7 +147,7 @@ export class ManualService {
         processedAt: row.processed_at,
       }))
     } catch (error) {
-      uploadLogger.error({ error }, 'Erro ao listar manuais')
+      uploadLogger.error({ err: error }, 'Erro ao listar manuais')
       return []
     }
   }
@@ -178,7 +178,7 @@ export class ManualService {
       uploadLogger.info({ manualId }, 'Manual deletado')
       return true
     } catch (error) {
-      uploadLogger.error({ error, manualId }, 'Erro ao deletar manual')
+      uploadLogger.error({ err: error, manualId }, 'Erro ao deletar manual')
       return false
     }
   }
