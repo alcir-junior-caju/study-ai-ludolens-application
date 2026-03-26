@@ -43,4 +43,23 @@ A maior complexidade técnica reside no pipeline de *Retrieval-Augmented Generat
 > *"Um RAG eficaz depende menos do LLM em si e mais do pipeline de dados que o alimenta. O verdadeiro desafio reside na orquestração."*
 
 ---
+
+## 5. Evolução do Projeto: Próximas Mudanças
+
+Esta seção documenta as melhorias incrementais aplicadas ao LudoLens como parte da evolução contínua do projeto estudantil.
+
+### 🧠 Prompt Enrichment
+
+<img alt="Prompt Enrichment" src="../_images/prompt-enrichement.png" style="margin: 15px 0" />
+
+A técnica de **Prompt Enrichment** (Enriquecimento de Prompt) foi incorporada ao pipeline para elevar a qualidade das respostas geradas pelo LLM. Em vez de enviar a pergunta do usuário diretamente ao modelo, o sistema agora **enriquece o prompt** com contexto adicional antes da chamada à LLM.
+
+* **O que muda:** A pergunta bruta do usuário passa por uma etapa intermediária que injeta informações relevantes — como contexto do jogo atual, histórico da conversa e trechos recuperados do manual — diretamente no prompt.
+* **Por que importa:** Prompts mais ricos e bem estruturados reduzem alucinações, melhoram a precisão das respostas e permitem que o modelo raciocine com mais contexto, sem depender apenas do seu conhecimento interno.
+* **Aprendizado:** A qualidade da saída de um LLM é diretamente proporcional à qualidade da entrada. Investir no pré-processamento do prompt é tão crítico quanto a escolha do modelo.
+
+### Aprendizado Prático:
+> *"Prompt Enrichment não é apenas uma otimização — é uma mudança de mentalidade: tratar o prompt como um artefato de engenharia, não como uma simples string."*
+
+---
 *Desenvolvido com ❤️ para a comunidade de board games e engenharia de software.*
